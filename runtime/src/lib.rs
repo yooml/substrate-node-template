@@ -98,7 +98,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("node-template"),
     impl_name: create_runtime_str!("node-template"),
     authoring_version: 1,
-    spec_version: 1,
+    spec_version: 8,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -301,6 +301,10 @@ impl pallet_template::Trait for Runtime {
     type Event = Event;
 }
 
+impl pallet_poe::Trait for Runtime {
+    type Event = Event;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
        pub enum Runtime where
@@ -319,6 +323,7 @@ construct_runtime!(
               // Include the custom logic from the template pallet in the runtime.
               TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
               Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
+              PoeModule: pallet_poe::{Module, Call, Storage, Event<T>},
        }
 );
 

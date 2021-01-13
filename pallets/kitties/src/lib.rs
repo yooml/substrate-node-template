@@ -30,6 +30,7 @@ decl_storage! {
         pub Kitties get(fn kitties): map hasher(blake2_128_concat) T::KittyIndex => Option<Kitty>;
         pub KittiesCount get(fn kitties_count): T::KittyIndex;
         pub KittyOwners get(fn kitty_owner): map hasher(blake2_128_concat) T::KittyIndex => Option<T::AccountId>;
+        pub OwnedKitties get(fn owned_kitties): map hasher(blake2_128_concat) T::AccountId => Option<T::KittyIndex>;
     }
 }
 
@@ -81,6 +82,8 @@ decl_module! {
         pub fn transfer(origin, to: T::AccountId, kitty_id: T::KittyIndex) {
             let sender = ensure_signed(origin)?;
             <KittyOwners<T>>::insert(kitty_id, to.clone());
+            OwnedKitties::<T>::remove(&sender);
+            OwnedKitties::<T>::insert(&to, kitty_id);
             Self::deposit_event(RawEvent::Transferred(sender, to , kitty_id));
         }
 
@@ -102,6 +105,7 @@ impl<T: Trait> Module<T> {
         <Kitties::<T>>::insert(kitty_id, kitty);
         <KittiesCount::<T>>::put(kitty_id + 1.into());
         <KittyOwners<T>>::insert(kitty_id, owner);
+        <OwnedKitties<T>>::insert(owner, kitty_id);
     }
 
     fn next_kitty_id() -> sp_std::result::Result<T::KittyIndex, DispatchError> {

@@ -43,6 +43,7 @@ pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
 pub use pallet_template;
+pub use pallet_kitties;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -57,6 +58,7 @@ pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::Account
 /// The type for looking up accounts. We don't expect more than 4 billion of them, but you
 /// never know...
 pub type AccountIndex = u32;
+pub type KittyIndex = u32;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -301,6 +303,12 @@ impl pallet_template::Trait for Runtime {
     type Event = Event;
 }
 
+impl pallet_kitties::Trait for Runtime {
+       type Event = Event;
+       type Randomness = RandomnessCollectiveFlip;
+       type KittyIndex = KittyIndex;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
        pub enum Runtime where
@@ -318,6 +326,7 @@ construct_runtime!(
               Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
               // Include the custom logic from the template pallet in the runtime.
               TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
+              KittiesModule: pallet_kitties::{Module, Call, Storage, Event<T>},
               Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
        }
 );
